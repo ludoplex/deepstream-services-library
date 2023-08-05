@@ -122,22 +122,17 @@ def state_change_listener(old_state, new_state, client_data):
 ## 
 def record_event_listener(session_info_ptr, client_data):
     print(' ***  Recording Event  *** ')
-    
+
     session_info = session_info_ptr.contents
 
     print('session_id: ', session_info.session_id)
-    
+
     # If we're starting a new recording for this source
     if session_info.recording_event == DSL_RECORDING_EVENT_START:
         print('event:      ', 'DSL_RECORDING_EVENT_START')
 
         # enable the always trigger showing the metadata for "recording in session" 
         retval = dsl_ode_trigger_enabled_set('rec-on-trigger', enabled=True)
-        if (retval != DSL_RETURN_SUCCESS):
-            print('Enable always trigger failed with error: ', 
-                dsl_return_value_to_string(retval))
-
-    # Else, the recording session has ended for this source
     else:
         print('event:      ', 'DSL_RECORDING_EVENT_END')
         print('filename:   ', session_info.filename)
@@ -149,9 +144,9 @@ def record_event_listener(session_info_ptr, client_data):
 
         # disable the always trigger showing the metadata for "recording in session" 
         retval = dsl_ode_trigger_enabled_set('rec-on-trigger', enabled=False)
-        if (retval != DSL_RETURN_SUCCESS):
-            print('Enable always trigger failed with error: ', 
-                dsl_return_value_to_string(retval))
+    if (retval != DSL_RETURN_SUCCESS):
+        print('Enable always trigger failed with error: ', 
+            dsl_return_value_to_string(retval))
 
 def main(args):
 

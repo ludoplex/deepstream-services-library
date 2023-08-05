@@ -65,9 +65,10 @@ def xwindow_key_event_handler(key_string, client_data):
     print('key released = ', key_string)
 
     if key_string >= '1' and key_string <= '4':
-        dsl_source_interpipe_listen_to_set('inter-pipe-source',
-            listen_to='inter-pipe-sink-'+key_string)
-            
+        dsl_source_interpipe_listen_to_set(
+            'inter-pipe-source', listen_to=f'inter-pipe-sink-{key_string}'
+        )
+
     elif key_string.upper() == 'Q' or key_string == '' or key_string == '':
         dsl_pipeline_stop('pipeline')
         dsl_main_loop_quit()

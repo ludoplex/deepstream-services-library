@@ -72,19 +72,17 @@ def xwindow_key_event_handler(key_string, client_data):
         dsl_pipeline_stop('pipeline')
         dsl_main_loop_quit()
 
-    # Add a new source
     elif key_string == '+': 
         if cur_source_count < MAX_SOURCE_COUNT:
             cur_source_count += 1
-            source_name = 'source-' + str(cur_source_count)
+            source_name = f'source-{cur_source_count}'
             print('adding source ', source_name)
             dsl_source_file_new(source_name, uri_h265, True)
             dsl_pipeline_component_add('pipeline', source_name)
 
-    # Remove the last source added
     elif key_string == '-': 
         if cur_source_count > 1:
-            source_name = 'source-' + str(cur_source_count)
+            source_name = f'source-{str(cur_source_count)}'
             print('removing source ', source_name)
             dsl_pipeline_component_remove('pipeline', source_name)
             dsl_component_delete(source_name)

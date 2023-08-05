@@ -174,19 +174,19 @@ def create_display_types():
 ##    
 class ComponentNames:    
     def __init__(self, source):    
-        self.source = source    
-        self.instance_trigger = source + '-instance-trigger'
-        self.always_trigger = source + '-always-trigger'
-        self.record_tap = source + '-record-tap'    
-        self.start_record = source + '-start-record'
-        self.display_meta = source + '-display-meta'
+        self.source = source
+        self.instance_trigger = f'{source}-instance-trigger'
+        self.always_trigger = f'{source}-always-trigger'
+        self.record_tap = f'{source}-record-tap'
+        self.start_record = f'{source}-start-record'
+        self.display_meta = f'{source}-display-meta'
         
 ##
 # Client listner function callad at the start and end of a recording session
 ##
 def OnRecordingEvent(session_info_ptr, client_data):
 
-    if client_data == None:
+    if client_data is None:
         return None
 
     # cast the C void* client_data back to a py_object pointer and deref
@@ -195,7 +195,7 @@ def OnRecordingEvent(session_info_ptr, client_data):
     session_info = session_info_ptr.contents
 
     print('session_id: ', session_info.session_id)
-    
+
     # If we're starting a new recording for this source
     if session_info.recording_event == DSL_RECORDING_EVENT_START:
         print('event:      ', 'DSL_RECORDING_EVENT_START')
@@ -213,7 +213,7 @@ def OnRecordingEvent(session_info_ptr, client_data):
         if (retval != DSL_RETURN_SUCCESS):
             print('Tiler show single source failed with error: ', 
                 dsl_return_value_to_string(retval))
-        
+
     # Else, the recording session has ended for this source
     else:
         print('event:      ', 'DSL_RECORDING_EVENT_END')
@@ -339,19 +339,19 @@ def CreatePerSourceComponents(pipeline, source, rtsp_uri, ode_handler):
 
 def main(args):    
 
-    # Since we're not using args, we can Let DSL initialize GST on first call    
-    while True:    
+    # Since we're not using args, we can Let DSL initialize GST on first call
+    while True:
 
-        retval = create_display_types()        
+        retval = create_display_types()
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
         # Create a new Action to display the "recording in-progress" text    
-        retval = dsl_ode_action_display_meta_add_new('rec-text-overlay', 'rec-text')    
+        retval = dsl_ode_action_display_meta_add_new('rec-text-overlay', 'rec-text')
         if retval != DSL_RETURN_SUCCESS:    
-            break    
+            break
         # Create a new Action to display the "recording in-progress" LED    
-        retval = dsl_ode_action_display_meta_add_new('red-led-overlay', 'red-led')    
+        retval = dsl_ode_action_display_meta_add_new('red-led-overlay', 'red-led')
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
@@ -371,18 +371,18 @@ def main(args):
             break
 
         # New Tiled Display, setting width and height, use default cols/rows set by source count    
-        retval = dsl_tiler_new('tiler', TILER_WIDTH, TILER_HEIGHT)    
+        retval = dsl_tiler_new('tiler', TILER_WIDTH, TILER_HEIGHT)
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
         # Object Detection Event (ODE) Pad Probe Handler (PPH) to manage our ODE 
         # Triggers with their ODE Actions    
-        retval = dsl_pph_ode_new('ode-handler')    
+        retval = dsl_pph_ode_new('ode-handler')
         if (retval != DSL_RETURN_SUCCESS):    
             break    
 
         # Add the ODE Pad Probe Hanlder to the Sink Pad of the Tiler    
-        retval = dsl_tiler_pph_add('tiler', 'ode-handler', DSL_PAD_SINK)    
+        retval = dsl_tiler_pph_add('tiler', 'ode-handler', DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
@@ -393,61 +393,48 @@ def main(args):
             break
 
         # New Overlay Sink, 0 x/y offsets and same dimensions as Tiled Display    
-        retval = dsl_sink_window_new('window-sink', 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)    
+        retval = dsl_sink_window_new('window-sink', 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
         # Add all the components to our pipeline    
         retval = dsl_pipeline_new_component_add_many('pipeline',     
-            ['primary-gie', 'iou-tracker', 'tiler', 'on-screen-display', 'window-sink', None])    
+            ['primary-gie', 'iou-tracker', 'tiler', 'on-screen-display', 'window-sink', None])
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
         # For each of our four sources, call the funtion to create the 
         # source-specific components.    
         retval = CreatePerSourceComponents('pipeline', 
-            'src-1', src_url_1, 'ode-handler')    
-        if (retval != DSL_RETURN_SUCCESS):    
-            break    
-#        retval = CreatePerSourceComponents('pipeline', 
-#            'src-2', src_url_2, 'ode-handler')    
-        if (retval != DSL_RETURN_SUCCESS):    
-            break    
-#        retval = CreatePerSourceComponents('pipeline', 
-#            'src-3', src_url_3, 'ode-handler')    
-        if (retval != DSL_RETURN_SUCCESS):    
-            break    
-#        retval = CreatePerSourceComponents('pipeline', 
-#            'src-4', src_url_4, 'ode-handler')    
-        if (retval != DSL_RETURN_SUCCESS):    
-            break    
-
+            'src-1', src_url_1, 'ode-handler')
+        if (retval != DSL_RETURN_SUCCESS):
+            break
         # Add the XWindow event handler functions defined above    
         retval = dsl_pipeline_xwindow_key_event_handler_add("pipeline", 
-            xwindow_key_event_handler, None)    
+            xwindow_key_event_handler, None)
         if retval != DSL_RETURN_SUCCESS:    
-            break    
+            break
         retval = dsl_pipeline_xwindow_delete_event_handler_add("pipeline", 
-            xwindow_delete_event_handler, None)    
+            xwindow_delete_event_handler, None)
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
         ## Add the listener callback functions defined above    
         retval = dsl_pipeline_state_change_listener_add('pipeline', 
-            state_change_listener, None)    
+            state_change_listener, None)
         if retval != DSL_RETURN_SUCCESS:    
-            break    
-        retval = dsl_pipeline_eos_listener_add('pipeline', eos_event_listener, None)    
+            break
+        retval = dsl_pipeline_eos_listener_add('pipeline', eos_event_listener, None)
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
         # Play the pipeline    
-        retval = dsl_pipeline_play('pipeline')    
+        retval = dsl_pipeline_play('pipeline')
         if retval != DSL_RETURN_SUCCESS:    
             break    
 
-        dsl_main_loop_run()    
-        retval = DSL_RETURN_SUCCESS    
+        dsl_main_loop_run()
+        retval = DSL_RETURN_SUCCESS
         break    
 
     # Print out the final result

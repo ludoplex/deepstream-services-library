@@ -37,12 +37,10 @@ class ColorParams():
         self.alpha = alpha
 
     def get_rgb_str(self):
-        return '{}, {}, {}, {}'.format(
-            int(self.red*255), int(self.green*255), int(self.blue*255), int(self.alpha*255))
+        return f'{int(self.red * 255)}, {int(self.green * 255)}, {int(self.blue * 255)}, {int(self.alpha * 255)}'
         
     def get_unique_name(self):
-        return '{}-{}-{}-{}'.format(
-            int(self.red*255), int(self.green*255), int(self.blue*255), int(self.alpha*255))
+        return f'{int(self.red * 255)}-{int(self.green * 255)}-{int(self.blue * 255)}-{int(self.alpha * 255)}'
 
 ##
 # RGB Color Button Class
@@ -73,20 +71,11 @@ class RgbColorButton(tk.Button):
         # Define the RGB string for setting TK colors, and configure the button color.
         self.rgb_str = '#%02x%02x%02x'%(red, green, blue)
         self.config(bg=self.rgb_str, activebackground=self.rgb_str)
-        
+
         # Setup the point values [1..0]
-        if red:
-            self.red_p = red / 255
-        else:
-            self.red_p = 0
-        if green:
-            self.green_p = green / 255
-        else:
-            self.green_p = 0
-        if blue:
-            self.blue_p = blue / 255
-        else:
-            self.blue_p = 0
+        self.red_p = red / 255 if red else 0
+        self.green_p = green / 255 if green else 0
+        self.blue_p = blue / 255 if blue else 0
         
     ##
     # Function to select this button

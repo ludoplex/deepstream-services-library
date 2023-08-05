@@ -106,7 +106,7 @@ def main(args):
         #------------------------------------------------------------------------
         # Step 1:  Create Actions and a Trigger to remove/hide the default
         #          label contents and bounding-box from all Objects
-        
+
         # Create a Format Label Action to remove the label.
         # This action will be added to an Occurrence Trigger to clear
         # remove all labels of all content for every Object. 
@@ -114,9 +114,6 @@ def main(args):
             font=None, has_bg_color=False, bg_color=None)
         if retval != DSL_RETURN_SUCCESS:
             break
-        if retval != DSL_RETURN_SUCCESS:
-            break
-
         # Create a Format Bounding Box Action to remove the box border from view
         retval = dsl_ode_action_bbox_format_new('remove-border', border_width=0,
             border_color=None, has_bg_color=False, bg_color=None)
@@ -189,7 +186,7 @@ def main(args):
             size = 2)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # Create a Format Label Action to
         retval = dsl_ode_action_label_format_new('format-label', 
             font = 'verdana-bold-16-white', 
@@ -243,7 +240,7 @@ def main(args):
             bg_color = 'shadow-black')
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         retval = dsl_display_type_rgba_rectangle_new('display-background',
             left = 1000, 
             top = 100, 
@@ -260,49 +257,51 @@ def main(args):
             display_types = ['display-shadow', 'display-background', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         retval = dsl_ode_trigger_always_new('always-trigger', 
             source = 'uri-source',
             when = DSL_ODE_PRE_OCCURRENCE_CHECK)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         retval = dsl_ode_trigger_action_add('always-trigger', 'display-area')
-        
-        
+
+
         #------------------------------------------------------------------------
         # Step 5:  Create two Display Actions and an Earliest Trigger to display the time
         #          of persistence of the object that was the earliest to enter view
         #          along with the objects location and dimensions
-        retval = dsl_ode_action_display_new('primary-display-action',
-            format_string = 'Following vehicle %{} for %{} seconds'.format(
-                DSL_METRIC_OBJECT_TRACKING_ID, DSL_METRIC_OBJECT_PERSISTENCE),
-            offset_x = 1010,
-            offset_y = 110,
-            font = 'verdana-bold-20-white',
-            has_bg_color = False,
-            bg_color = None)
+        retval = dsl_ode_action_display_new(
+            'primary-display-action',
+            format_string=f'Following vehicle %{DSL_METRIC_OBJECT_TRACKING_ID} for %{DSL_METRIC_OBJECT_PERSISTENCE} seconds',
+            offset_x=1010,
+            offset_y=110,
+            font='verdana-bold-20-white',
+            has_bg_color=False,
+            bg_color=None,
+        )
         if retval != DSL_RETURN_SUCCESS:
             break
-        
-        retval = dsl_ode_action_display_new('secondary-display-action',
-            format_string = 'Location: %{} Dimensions: %{}'.format(
-                DSL_METRIC_OBJECT_LOCATION, DSL_METRIC_OBJECT_DIMENSIONS),
-            offset_x = 1010,
-            offset_y = 150,
-            font = 'verdana-bold-16-white',
-            has_bg_color = False,
-            bg_color = None)
+
+        retval = dsl_ode_action_display_new(
+            'secondary-display-action',
+            format_string=f'Location: %{DSL_METRIC_OBJECT_LOCATION} Dimensions: %{DSL_METRIC_OBJECT_DIMENSIONS}',
+            offset_x=1010,
+            offset_y=150,
+            font='verdana-bold-16-white',
+            has_bg_color=False,
+            bg_color=None,
+        )
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         retval = dsl_ode_trigger_earliest_new('earliest-trigger', 
             source = 'uri-source',
             class_id = PGIE_CLASS_ID_VEHICLE, 
             limit = DSL_ODE_TRIGGER_LIMIT_NONE)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         retval = dsl_ode_trigger_action_add_many('earliest-trigger',
             actions=['format-bbox-blue', 'primary-display-action', 
             'secondary-display-action', None])
@@ -315,14 +314,14 @@ def main(args):
         retval = dsl_pph_ode_new('ode-handler')
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # NOTE: Order of addition is important - specifies execution order
         retval = dsl_pph_ode_trigger_add_many('ode-handler', 
             triggers = ['always-trigger', 'occurrence-trigger', 'persitence-trigger', 
                 'earliest-trigger', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         #------------------------------------------------------------------------
         # Step 6:  Create the remaining Pipeline components
 
@@ -330,7 +329,7 @@ def main(args):
         retval = dsl_source_file_new('uri-source', file_path, True)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # New Primary TIS using the filespec specified above, with interval = 0
         retval = dsl_infer_tis_primary_new('primary-tis', primary_infer_config_file, 1)
         if retval != DSL_RETURN_SUCCESS:
@@ -346,8 +345,7 @@ def main(args):
             text_enabled=True, clock_enabled=True, bbox_enabled=True, mask_enabled=False)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
-         # Add our ODE Pad Probe Handler to the Sink pad of the Tiler
+
         retval = dsl_osd_pph_add('on-screen-display', handler='ode-handler', pad=DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:
             break

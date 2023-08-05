@@ -78,12 +78,12 @@ g_num_active_pipelines = 0
 ##    
 class ComponentNames:    
     def __init__(self, id):    
-        self.pipeline = 'pipeline-' + str(id)
-        self.source = 'source-' + str(id)
-        self.pgie = 'pgie-' + str(id)
-        self.tracker = 'tracker-' + str(id)
-        self.osd = 'osd-' + str(id)
-        self.sink = 'window-sink-' + str(id)
+        self.pipeline = f'pipeline-{str(id)}'
+        self.source = f'source-{str(id)}'
+        self.pgie = f'pgie-{str(id)}'
+        self.tracker = f'tracker-{str(id)}'
+        self.osd = f'osd-{str(id)}'
+        self.sink = f'window-sink-{str(id)}'
 
 ## 
 # Function to be called on XWindow KeyRelease event
