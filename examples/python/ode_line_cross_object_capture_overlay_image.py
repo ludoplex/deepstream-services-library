@@ -133,11 +133,11 @@ def main(args):
 
     # Since we're not using args, we can Let DSL initialize GST on first call
     while True:
-   
+       
         #-----------------------------------------------------------------------------
         # First, create the RGBA Display Types that will be used to display the 
         # current metrics; currently tracking, total tracked, and IN and OUT crossings.
-        
+
         retval = dsl_display_type_rgba_color_predefined_new('light-yellow',
             color_id = DSL_COLOR_PREDEFINED_LIGHT_YELLOW, alpha = 1.0)
         if retval != DSL_RETURN_SUCCESS:
@@ -180,7 +180,7 @@ def main(args):
         # Add the Display Action to the Always Trigger.
         retval = dsl_ode_trigger_action_add('every-frame-trigger',
             'add-background')
-       
+
         #-----------------------------------------------------------------------------
         # Next, create a new Occurrence Trigger with Actions to remove/hide
         # all object bounding boxes and labels. 
@@ -194,7 +194,7 @@ def main(args):
             bg_color = None)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Create a new Action to remove the Object labels by default.
         # The bounding box will be reformatted by the ODE Cross Trigger
         retval = dsl_ode_action_label_format_new('remove-label',
@@ -209,13 +209,13 @@ def main(args):
             limit = DSL_ODE_TRIGGER_LIMIT_NONE)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Add both Format Actions to the every-occurrence Trigger
         retval = dsl_ode_trigger_action_add_many('every-occurrence-trigger',
             actions = ['remove-bbox', 'remove-label', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         #-----------------------------------------------------------------------------
         # Next, create new Display Types, ODE Line Area, ODE Print and Capture Object
         # actions, and ODE Cross Trigger.
@@ -225,17 +225,17 @@ def main(args):
             red=1.0, green=0.2, blue=0.2, alpha=0.6)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Create the RGBA Line Display Type with a width of 6 pixels for hysteresis
         retval = dsl_display_type_rgba_line_new('line',
             x1=260, y1=680, x2=600, y2=660, width=6, color='opaque-red')
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Create the ODE line area to use as criteria for ODE occurrence.
         # Use the center point on the bounding box's bottom edge for testing
         retval = dsl_ode_area_line_new('line-area', line='line',
-            show=True, bbox_test_point=DSL_BBOX_POINT_SOUTH)    
+            show=True, bbox_test_point=DSL_BBOX_POINT_SOUTH)
         if retval != DSL_RETURN_SUCCESS:
             break
 
@@ -259,7 +259,7 @@ def main(args):
             min_confidence = PERSON_MIN_CONFIDENCE)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Set minimum bounding-box dimensions... we don't care about
         # objects off in the distance, away from the line. 
         retval = dsl_ode_trigger_dimensions_min_set('person-crossing-line',
@@ -288,7 +288,7 @@ def main(args):
             enabled=True, color='random-color', line_width=4)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Add the line area to the New Cross Trigger
         retval = dsl_ode_trigger_area_add('person-crossing-line', area='line-area')
         if retval != DSL_RETURN_SUCCESS:
@@ -299,7 +299,7 @@ def main(args):
         retval = dsl_ode_action_bbox_scale_new('scale-bbox-action', scale=150)
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         # Create a new Capture Action to capture the object to jpeg image, and save to file.
         retval = dsl_ode_action_capture_object_new('person-capture-action', outdir="./")
         if retval != DSL_RETURN_SUCCESS:
@@ -347,34 +347,34 @@ def main(args):
         #`````````````````````````````````````````````````````````````````````````````
         # Next, create an ODE Accumulator and ODE Display Action for the Line Cross 
         # metrics. Action is added to the Accumulator which is added to the Trigger.
-        
+
         # Create a new Display Action used to display the Accumulated ODE Occurrences.
         # Format the display string using the occurrences in and out tokens.
-        retval = dsl_ode_action_display_new('display-cross-metrics-action',
-            format_string =
-                "In : %" + str(DSL_METRIC_OBJECT_OCCURRENCES_DIRECTION_IN) +
-                ", Out : %" + str(DSL_METRIC_OBJECT_OCCURRENCES_DIRECTION_OUT),  
-            offset_x = 1200,
-            offset_y = 100,
-            font = 'arial-16-yellow',
-            has_bg_color = False,
-            bg_color = None)
+        retval = dsl_ode_action_display_new(
+            'display-cross-metrics-action',
+            format_string=f"In : %{str(DSL_METRIC_OBJECT_OCCURRENCES_DIRECTION_IN)}, Out : %{str(DSL_METRIC_OBJECT_OCCURRENCES_DIRECTION_OUT)}",
+            offset_x=1200,
+            offset_y=100,
+            font='arial-16-yellow',
+            has_bg_color=False,
+            bg_color=None,
+        )
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Create an ODE Accumulator to add to the Cross Trigger. The Accumulator
         # will work with the Trigger to accumulate the IN and OUT occurrence metrics.
         retval = dsl_ode_accumulator_new('cross-accumulator')
         if retval != DSL_RETURN_SUCCESS:
             break
-       
+
         # Add the Display Action to the Accumulator. The Accumulator will call on
         # the Display Action to display the new accumulative metrics after each frame.
         retval = dsl_ode_accumulator_action_add('cross-accumulator',
             'display-cross-metrics-action')
         if retval != DSL_RETURN_SUCCESS:
             break
-       
+
         # Add the Accumulator to the Line Cross Trigger.
         retval = dsl_ode_trigger_accumulator_add('person-crossing-line',
             'cross-accumulator')
@@ -395,7 +395,7 @@ def main(args):
             min_confidence = PERSON_MIN_CONFIDENCE)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Use same criteria as Cross Trigger
         retval = dsl_ode_trigger_dimensions_min_set('objects-sumation-trigger',
             min_width = 0, min_height = PERSON_MIN_BBOX_HEIGHT)
@@ -410,23 +410,24 @@ def main(args):
 
         # Create a new Display Action used to display the number of Objects
         # detected/tracked. Format the display string using the occurrences.
-        retval = dsl_ode_action_display_new('display-summation-action',
-            format_string =
-                "Currently Tracking  : %" + str(DSL_METRIC_OBJECT_OCCURRENCES) ,
-            offset_x = 1200,
-            offset_y = 40,
-            font = 'arial-16-yellow',
-            has_bg_color = False,
-            bg_color = None)
+        retval = dsl_ode_action_display_new(
+            'display-summation-action',
+            format_string=f"Currently Tracking  : %{str(DSL_METRIC_OBJECT_OCCURRENCES)}",
+            offset_x=1200,
+            offset_y=40,
+            font='arial-16-yellow',
+            has_bg_color=False,
+            bg_color=None,
+        )
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         # Add the Display Action to the Summation Trigger
         retval = dsl_ode_trigger_action_add('objects-sumation-trigger',
             'display-summation-action')
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         #-----------------------------------------------------------------------------
 
         # New ODE Trigger for New Person Instance - i.e. one new ODE occurrence
@@ -443,7 +444,7 @@ def main(args):
             min_confidence = PERSON_MIN_CONFIDENCE)
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Use same criteria as Cross and Summation Triggers
         retval = dsl_ode_trigger_dimensions_min_set('new-instance-trigger',
             min_width = 0, min_height = PERSON_MIN_BBOX_HEIGHT)
@@ -464,46 +465,47 @@ def main(args):
 
         # Create a new Display Action used to display the number of Objects
         # detected/tracked. Format the display string using the occurrences.
-        retval = dsl_ode_action_display_new('display-total-action',
-            format_string =
-                "Total Tracked  : %" + str(DSL_METRIC_OBJECT_OCCURRENCES) ,
-            offset_x = 1200,
-            offset_y = 70,
-            font = 'arial-16-yellow',
-            has_bg_color = False,
-            bg_color = None)
+        retval = dsl_ode_action_display_new(
+            'display-total-action',
+            format_string=f"Total Tracked  : %{str(DSL_METRIC_OBJECT_OCCURRENCES)}",
+            offset_x=1200,
+            offset_y=70,
+            font='arial-16-yellow',
+            has_bg_color=False,
+            bg_color=None,
+        )
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Add the Display Action to the Accumulator 
         retval = dsl_ode_accumulator_action_add('instance-accumulator',
             'display-total-action')
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Add the Accumulator to the New Instance Trigger.
         retval = dsl_ode_trigger_accumulator_add('new-instance-trigger',
             'instance-accumulator')
-           
+
         #-----------------------------------------------------------------------------
 
         # New ODE Handler to handle all ODE Triggers with their Areas and Actions    
         retval = dsl_pph_ode_new('ode-handler')
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Add the two ODE Trigger to the ODE Handler - order is important    
         retval = dsl_pph_ode_trigger_add_many('ode-handler', triggers=[
             'every-frame-trigger', 'every-occurrence-trigger', 'person-crossing-line',
             'objects-sumation-trigger', 'new-instance-trigger', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-       
-       
+
+
         ############################################################################################
         #
         # Create the remaining Pipeline components
-       
+
         # New File Source using the file path defined at the top of the file
         retval = dsl_source_file_new('file-source',
             file_path = uri_h265,
@@ -528,7 +530,6 @@ def main(args):
         if retval != DSL_RETURN_SUCCESS:
             break
 
-         # Add our ODE Pad Probe Handler to the Sink pad of the Tiler
         retval = dsl_osd_pph_add('on-screen-display', handler='ode-handler', pad=DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:
             break
@@ -543,7 +544,7 @@ def main(args):
             ['file-source', 'primary-gie', 'iou-tracker', 'on-screen-display', 'window-sink', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-           
+
         # Set the XWindow into full-screen mode for a kiosk look
         retval = dsl_pipeline_xwindow_fullscreen_enabled_set('pipeline', True)
         if retval != DSL_RETURN_SUCCESS:

@@ -102,7 +102,7 @@ def websocket_server_client_listener_cb(path, client_data):
         return
     CUR_SINK_NUMBER += 1
 
-    sink_name = 'webrtc-sink-{}'.format(CUR_SINK_NUMBER)
+    sink_name = f'webrtc-sink-{CUR_SINK_NUMBER}'
     print(sink_name)
     # New WebRTC Sink with .
     retval = dsl_sink_webrtc_new(sink_name,

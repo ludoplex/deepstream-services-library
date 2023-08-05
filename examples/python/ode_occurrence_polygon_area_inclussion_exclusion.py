@@ -96,12 +96,12 @@ def main(args):
 
     # Since we're not using args, we can Let DSL initialize GST on first call
     while True:
-    
+
         # This example demonstrates the use of a Polygon Area for Inclusion 
         # or Exlucion critera for ODE occurrence. Change the variable below to try each.
-        
+
         area_type = INCLUSION_AREA
-        
+
         #```````````````````````````````````````````````````````````````````````````````````
 
         # Create a Format Label Action to remove the Object Label from view
@@ -110,7 +110,7 @@ def main(args):
             font=None, has_bg_color=False, bg_color=None)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # Create a Format Bounding Box Action to remove the box border from view
         retval = dsl_ode_action_bbox_format_new('remove-border', border_width=0,
             border_color=None, has_bg_color=False, bg_color=None)
@@ -141,41 +141,38 @@ def main(args):
         # Polygon can have a minimum of 3, maximum of 16 points (sides)
         coordinates = [dsl_coordinate(365,600), dsl_coordinate(580,620), 
             dsl_coordinate(600, 770), dsl_coordinate(180,750)]
-            
+
         # Create the Polygon display type 
         retval = dsl_display_type_rgba_polygon_new('polygon1', 
             coordinates=coordinates, num_coordinates=len(coordinates), border_width=4, color='opaque-red')
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # create the ODE inclusion area to use as criteria for ODE occurrence
         if area_type == INCLUSION_AREA:
             retval = dsl_ode_area_inclusion_new('polygon-area', polygon='polygon1', 
-                show=True, bbox_test_point=DSL_BBOX_POINT_SOUTH)    
-            if retval != DSL_RETURN_SUCCESS:
-                break
+                show=True, bbox_test_point=DSL_BBOX_POINT_SOUTH)
         else:
             retval = dsl_ode_area_exclusion_new('polygon-area', polygon='polygon1', 
-                show=True, bbox_test_point=DSL_BBOX_POINT_SOUTH)    
-            if retval != DSL_RETURN_SUCCESS:
-                break
-
+                show=True, bbox_test_point=DSL_BBOX_POINT_SOUTH)
+        if retval != DSL_RETURN_SUCCESS:
+            break
         # New Occurrence Trigger, filtering on PERSON class_id, and with no limit on the number of occurrences
         retval = dsl_ode_trigger_occurrence_new('person-occurrence-trigger', source=DSL_ODE_ANY_SOURCE,
             class_id=PGIE_CLASS_ID_PERSON, limit=DSL_ODE_TRIGGER_LIMIT_NONE)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         retval = dsl_ode_trigger_area_add('person-occurrence-trigger', area='polygon-area')
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         retval = dsl_ode_trigger_action_add('person-occurrence-trigger', action='fill-action')
         if retval != DSL_RETURN_SUCCESS:
             break
 
         #```````````````````````````````````````````````````````````````````````````````````````````````````````````````
-        
+
         # New ODE Handler to handle all ODE Triggers with their Areas and Actions    
         retval = dsl_pph_ode_new('ode-handler')
         if retval != DSL_RETURN_SUCCESS:
@@ -184,12 +181,12 @@ def main(args):
             triggers=['every-occurrence-trigger', 'person-occurrence-trigger', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-        
-        
+
+
         ############################################################################################
         #
         # Create the remaining Pipeline components
-        
+
         # New URI File Source using the filespec defined above
         retval = dsl_source_uri_new('uri-source', uri_h265, False, False, 0)
         if retval != DSL_RETURN_SUCCESS:
@@ -210,8 +207,7 @@ def main(args):
         retval = dsl_tiler_new('tiler', TILER_WIDTH, TILER_HEIGHT)
         if retval != DSL_RETURN_SUCCESS:
             break
- 
-         # Add our ODE Pad Probe Handler to the Sink pad of the Tiler
+
         retval = dsl_tiler_pph_add('tiler', handler='ode-handler', pad=DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:
             break

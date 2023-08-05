@@ -95,22 +95,22 @@ def main(args):
 
     # Since we're not using args, we can Let DSL initialize GST on first call
     while True:
-    
+
         # This example is used to demonstrate the Use of Minimum, Maximum, and Range Triggers.
         # The triggers, upon meeting all criteria, will fill a rectangle Area on the Frame 
         # with color indicating: 
         #    Yellow = object count below Minimum
         #    Red = object count above Maximum 
         #    Green = object count in range of Minimim to Maximum.
-        
+
         # A secondary indicatory of filling the full Frame with a shade of red will be used
         # to stress that the object count within the frame has exceeded the Maximum
-        
+
         # An additional Summation Trigger with Display Action will display the total number of objects 
         # next to the colored/filled area-indicator
-        
+
         #```````````````````````````````````````````````````````````````````````````````````````````````````````````````
-        
+
         # New RGBA color types to be used for our object count indicator
         retval = dsl_display_type_rgba_color_custom_new('full-green', red=.0, green=1.0, blue=0.0, alpha=1.0)
         if retval != DSL_RETURN_SUCCESS:
@@ -121,16 +121,16 @@ def main(args):
         retval = dsl_display_type_rgba_color_custom_new('full-red', red=1.0, green=0.0, blue=0.0, alpha=1.0)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         #```````````````````````````````````````````````````````````````````````````````````````````````````````````````
         # Next, create all Display Types and Actions for our object count indicators
-            
+
 
         ind_left=10
         ind_top=60
         ind_width=33
         ind_height=ind_width
-        
+
         # Three new RGBA Rectangles, one for each of our Minumum/Maximum/Range ODE Trigger occurrences
         retval = dsl_display_type_rgba_rectangle_new('green-rectangle', 
             left=ind_left, top=ind_top, width=ind_width, height=ind_height, border_width=0, 
@@ -174,16 +174,18 @@ def main(args):
 
         # Create a new  Action used to display the summation of all Objects.
         # Format the display string using the occurrences token.
-        retval = dsl_ode_action_display_new('display-action', 
-            format_string = "Object count = %" + str(DSL_METRIC_OBJECT_OCCURRENCES),  
-            offset_x = 45,
-            offset_y = 60, 
-            font = 'arial-16-white', 
-            has_bg_color = True, 
-            bg_color = 'full-black')
+        retval = dsl_ode_action_display_new(
+            'display-action',
+            format_string=f"Object count = %{str(DSL_METRIC_OBJECT_OCCURRENCES)}",
+            offset_x=45,
+            offset_y=60,
+            font='arial-16-white',
+            has_bg_color=True,
+            bg_color='full-black',
+        )
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # Create a Format Label Action to remove the Object Label from view
         # Note: the label can be disabled with the OSD API as well. 
         retval = dsl_ode_action_label_format_new('remove-label', 
@@ -213,7 +215,7 @@ def main(args):
         retval = dsl_ode_trigger_action_add('r2-object-count', action='add-yellow-rectangle')
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # Third Count trigger with range of 9 to 0 (no-max), and with no limit on the number of occurrences
         retval = dsl_ode_trigger_count_new('r3-object-count', source=DSL_ODE_ANY_SOURCE,
             class_id=DSL_ODE_ANY_CLASS, limit=DSL_ODE_TRIGGER_LIMIT_NONE, 
@@ -226,7 +228,7 @@ def main(args):
 
         #```````````````````````````````````````````````````````````````````````````````````````````````````````````````
         # Next, create the Summation and Occurrence Triggers to display the Object Count and Hide each Object's Display Text
-        
+
         # New ODE Trigger for Object summation - i.e. new ODE occurrence on detection summation for each frame.
         retval = dsl_ode_trigger_summation_new('objects', source=DSL_ODE_ANY_SOURCE, 
             class_id=DSL_ODE_ANY_CLASS, limit=DSL_ODE_TRIGGER_LIMIT_NONE)
@@ -246,7 +248,7 @@ def main(args):
             break
 
         #```````````````````````````````````````````````````````````````````````````````````````````````````````````````
-        
+
         # New ODE Handler to handle all ODE Triggers with their Areas and Actions    
         retval = dsl_pph_ode_new('ode-handler')
         if retval != DSL_RETURN_SUCCESS:
@@ -260,12 +262,12 @@ def main(args):
             None])
         if retval != DSL_RETURN_SUCCESS:
             break
-        
-        
+
+
         ############################################################################################
         #
         # Create the remaining Pipeline components
-        
+
         # New URI File Source using the filespec defined above
         retval = dsl_source_uri_new('uri-source', uri_h265, False, False, 0)
         if retval != DSL_RETURN_SUCCESS:
@@ -286,8 +288,7 @@ def main(args):
         retval = dsl_tiler_new('tiler', TILER_WIDTH, TILER_HEIGHT)
         if retval != DSL_RETURN_SUCCESS:
             break
- 
-         # Add our ODE Pad Probe Handler to the Sink pad of the Tiler
+
         retval = dsl_tiler_pph_add('tiler', handler='ode-handler', pad=DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:
             break

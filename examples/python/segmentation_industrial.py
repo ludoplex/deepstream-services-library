@@ -120,7 +120,7 @@ def main(args):
         retval = dsl_sink_window_new('window-sink', 100, 1000, width, height)
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         # Example of how to force the aspect ratio during window resize
         dsl_sink_window_force_aspect_ratio_set('window-sink', force=True)
         if retval != DSL_RETURN_SUCCESS:
@@ -143,7 +143,7 @@ def main(args):
             ['image-source', 'primary-gie', 'segvisual', 'window-sink', None])
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # Set the Streammuxer dimensions to the same as GIE Config and Sink dimensions
         retval = dsl_pipeline_streammux_dimensions_set("pipeline", 
             width=width, height=height)
@@ -166,9 +166,6 @@ def main(args):
         dsl_main_loop_run()
         retval = DSL_RETURN_SUCCESS
         break
-
-        # Print out the final result
-        print(dsl_return_value_to_string(retval))
 
     dsl_pipeline_delete_all()
     dsl_component_delete_all()

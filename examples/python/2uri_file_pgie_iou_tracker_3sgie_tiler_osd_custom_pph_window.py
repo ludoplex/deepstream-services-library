@@ -117,7 +117,7 @@ def main(args):
         if retval != DSL_RETURN_SUCCESS:
             break
 
-        if (dsl_info_gpu_type_get(0) == DSL_GPU_TYPE_INTEGRATED) :
+        if (dsl_info_gpu_type_get(0) == DSL_GPU_TYPE_INTEGRATED):
             # New Primary GIE using the filespecs above with interval = 0
             retval = dsl_infer_gie_primary_new('pgie', 
                 primary_infer_config_file_jetson, primary_model_engine_file_jetson, 3)
@@ -135,9 +135,7 @@ def main(args):
                 break
             retval = dsl_infer_gie_secondary_new('vehicletype-sgie', 
                 sgie3_config_file, sgie3_model_file_jetson, 'pgie', 0)
-            if retval != DSL_RETURN_SUCCESS:
-                break
-        else :
+        else:
             # New Primary GIE using the filespecs above with interval = 0
             retval = dsl_infer_gie_primary_new('pgie', 
                 primary_infer_config_file_dgpu, primary_model_engine_file_dgpu, 3)
@@ -155,10 +153,8 @@ def main(args):
                 break
             retval = dsl_infer_gie_secondary_new('vehicletype-sgie', 
                 sgie3_config_file, sgie3_model_file_dgpu, 'pgie', 0)
-            if retval != DSL_RETURN_SUCCESS:
-                break
-
-
+        if retval != DSL_RETURN_SUCCESS:
+            break
         # New IOU Tracker, setting operational width and hieght
         retval = dsl_tracker_new('iou-tracker', iou_tracker_config_file, 480, 272)
         if retval != DSL_RETURN_SUCCESS:
@@ -168,7 +164,7 @@ def main(args):
         retval = dsl_tiler_new('tiler', 1920, 720)
         if retval != DSL_RETURN_SUCCESS:
             break
- 
+
         # New OSD with text, clock and bbox display all enabled. 
         retval = dsl_osd_new('on-screen-display', 
             text_enabled=True, clock_enabled=True, bbox_enabled=True, mask_enabled=False)
@@ -179,12 +175,12 @@ def main(args):
         retval = dsl_pph_custom_new('custom-pph', client_handler=osd_sink_pad_buffer_probe, client_data=None)
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         # Add the custom PPH to the Sink pad of the OSD
         retval = dsl_osd_pph_add('on-screen-display', handler='custom-pph', pad=DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:
             break
-        
+
         ## New Window Sink, 0 x/y offsets and same dimensions as Tiled Display
         retval = dsl_sink_window_new('window-sink', 0, 0, 1280, 720)
         if retval != DSL_RETURN_SUCCESS:
@@ -220,9 +216,6 @@ def main(args):
         dsl_main_loop_run()
         retval = DSL_RETURN_SUCCESS
         break
-
-        # Print out the final result
-        print(dsl_return_value_to_string(retval))
 
     dsl_pipeline_delete_all()
     dsl_component_delete_all()

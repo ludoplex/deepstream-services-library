@@ -105,10 +105,7 @@ def new_buffer_handler_cb(data_type, buffer, user_data):
             except StopIteration:
                 break
 
-        frame_stats = \
-            "Frame Number={} Number of Objects={} Vehicle_count={} Person_count={}".format(
-               frame_number, num_rects, obj_counter[PGIE_CLASS_ID_VEHICLE], 
-               obj_counter[PGIE_CLASS_ID_PERSON])
+        frame_stats = f"Frame Number={frame_number} Number of Objects={num_rects} Vehicle_count={obj_counter[PGIE_CLASS_ID_VEHICLE]} Person_count={obj_counter[PGIE_CLASS_ID_PERSON]}"
 
         print(frame_stats)
         try:

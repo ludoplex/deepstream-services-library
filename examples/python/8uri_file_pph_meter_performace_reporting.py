@@ -144,7 +144,7 @@ def main(args):
 
     # Since we're not using args, we can Let DSL initialize GST on first call
     while True:
-    
+
         #
         # New Meter Pad Probe Handler that will measure the Pipeline's throughput. Our client callback will handle writing the 
         # Avg Session FPS and Avg Interval FPS measurements to the console. The Key-released-handler callback (above)
@@ -152,14 +152,14 @@ def main(args):
         # Note: Session averages are reset each time a Meter is disabled and then re-enable.
 
         report_data = ReportData(header_interval=12)
-        
+
         retval = dsl_pph_meter_new('meter-pph', interval=1, client_handler=meter_sink_handler, client_data=report_data)
         if retval != DSL_RETURN_SUCCESS:
             break
         #
         # Create the remaining Pipeline components
         # ... starting with eight URI File Sources
-        
+
         retval = dsl_source_uri_new('Camera 1', uri, False, False, 0)
         if retval != DSL_RETURN_SUCCESS:
             break
@@ -190,13 +190,13 @@ def main(args):
         retval = dsl_tiler_new('tiler', TILER_WIDTH, TILER_HEIGHT)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # Important: add the Meter to the Sink pad of the Tiler, while the stream is still batched and
         # measurements can be made for all sources. Adding downstream will measure the combined, tiled stream
         retval = dsl_tiler_pph_add('tiler', 'meter-pph', DSL_PAD_SINK)
         if retval != DSL_RETURN_SUCCESS:
             break
-            
+
         # New OSD with text, clock and bbox display all enabled. 
         retval = dsl_osd_new('on-screen-display', 
             text_enabled=True, clock_enabled=True, bbox_enabled=True, mask_enabled=False)
@@ -206,18 +206,15 @@ def main(args):
         #----------------------------------------------------------------------------------------------------
         # Create one of the Render Sink Types, Overlay or Window, based on target type
         # at a time, but it's easier to create both and just update the Pipeline assembly below as needed.
-        
+
         if (dsl_info_gpu_type_get(0) == DSL_GPU_TYPE_INTEGRATED):
             # New Overlay Sink, 0 x/y offsets and same dimensions as Tiled Display
             retval = dsl_sink_overlay_new('render-sink', 0, 0, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
-            if retval != DSL_RETURN_SUCCESS:
-                break
         else:
             # New Window Sink, 0 x/y offsets and same dimensions as Tiled Display
             retval = dsl_sink_window_new('render-sink', 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
-            if retval != DSL_RETURN_SUCCESS:
-                break
-
+        if retval != DSL_RETURN_SUCCESS:
+            break
         #----------------------------------------------------------------------------------------------------
         # Pipeline assembly
         #
